@@ -1,22 +1,20 @@
 # Simple Server Resource Monitor
 
-A lightweight Python-based HTTP health-check service that reports CPU, memory, and disk usage.  
-Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-kuma) (via HTTP JSON Query) and managed as a systemd service.
+A lightweight Python-based HTTP health-check service that reports CPU, memory, and disk usage. Also logs metrics to a CSV file for historical analysis and visualization. Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-kuma) (via HTTP JSON Query) and managed as a systemd service.
 
 ---
 
 ## 📂 Project Structure
 
 ```
-
 /opt/simple-monitor/
 ├── monitor.py               # Main Python script
 ├── .env                     # Environment configuration
 ├── venv/                    # Python virtual environment
 ├── simple-monitor.service   # systemd unit file
 ├── install.sh               # Automated installer
+├── metrics.csv              # CSV log of resource metrics
 └── README.md                # This file
-
 ```
 
 ---
@@ -81,6 +79,9 @@ MONITOR_BIND_IPS=127.0.0.1,172.17.0.1
 CPU_THRESHOLD=85
 MEM_THRESHOLD=90
 DISK_THRESHOLD=90
+
+# CSV log file path (optional)
+CSV_FILE=metrics.csv
 ```
 
 After changing `.env`, reload the service:
@@ -127,6 +128,36 @@ Example:
 ```bash
 curl -H "X-Auth-Token: your-strong-token" http://127.0.0.1:5000/health
 ```
+
+---
+
+## 📈 Logging and Visualization
+
+Metrics are logged to a CSV file (`metrics.csv` by default).
+
+To visualize the data:
+
+1. **Spreadsheet Visualization**
+   Open the CSV file (e.g., `metrics.csv`) in Google Sheets, Excel, or any spreadsheet software. You can easily create line charts or graphs using the data.
+
+2. **Python Visualization**
+   Use the provided `plot.py` script to generate a visualization of system metrics:
+
+   - First, make sure you have the required Python libraries installed:
+
+     ```bash
+     pip install pandas matplotlib
+     ```
+
+   - Then, run the script with the CSV filename as an argument:
+
+     ```bash
+     python3 plot.py metrics.csv
+     ```
+
+3. **Example Output**
+
+   _Here’s an example output chart:_
 
 ---
 

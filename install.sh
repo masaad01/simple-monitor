@@ -15,9 +15,12 @@ chown root:root "${DEST_DIR}"
 chmod 755 "${DEST_DIR}"
 
 # 2. Copy files
-echo "   • Copying monitor.py and .env"
+echo "   • Copying monitor.py and .env and creating metrics.csv"
 cp "${SCRIPT_DIR}/monitor.py" "${DEST_DIR}/"
 cp "${SCRIPT_DIR}/.env" "${DEST_DIR}/"
+echo "timestamp,cpu,memory,disk,status" >"${DEST_DIR}/metrics.csv"
+
+chmod 666 "${DEST_DIR}/metrics.csv"
 chmod 755 "${DEST_DIR}/monitor.py"
 chmod 644 "${DEST_DIR}/.env"
 

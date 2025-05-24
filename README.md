@@ -158,6 +158,7 @@ To visualize the data:
 3. **Example Output**
 
    _Here’s an example output chart:_
+   ![sample](https://github.com/user-attachments/assets/9af9f999-ca8b-4062-83b2-927a987692ed)
 
 ---
 

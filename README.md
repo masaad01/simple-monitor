@@ -1,7 +1,7 @@
 # Simple Server Resource Monitor
 
 A lightweight Python-based HTTP health-check service that reports CPU, memory, and disk usage.  
-Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-kuma) (via HTTP JSON Query) and managed as a systemd service.  
+Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-kuma) (via HTTP JSON Query) and managed as a systemd service.
 
 ---
 
@@ -17,7 +17,7 @@ Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-k
 ├── install.sh               # Automated installer
 └── README.md                # This file
 
-````
+```
 
 ---
 
@@ -34,6 +34,7 @@ Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-k
 
 1. **Clone or copy** all files to a local directory on your server.
 2. **Make the installer executable**:
+
    ```bash
    chmod +x install.sh
    ```
@@ -46,10 +47,10 @@ Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-k
 
    This will:
 
-   * Create `/opt/simple-monitor/`
-   * Copy over `monitor.py`, `.env`, and the service file
-   * Create a Python virtual environment and install `psutil` & `python-dotenv`
-   * Enable and start the `simple-monitor` systemd service
+   - Create `/opt/simple-monitor/`
+   - Copy over `monitor.py`, `.env`, and the service file
+   - Create a Python virtual environment and install `psutil` & `python-dotenv`
+   - Enable and start the `simple-monitor` systemd service
 
 4. **Verify** that the service is running:
 
@@ -94,12 +95,12 @@ sudo systemctl restart simple-monitor.service
 
 All endpoints require authentication via either:
 
-* **Header**: `X-Auth-Token: <MONITOR_TOKEN>`
-* **Query**: `?token=<MONITOR_TOKEN>`
+- **Header**: `X-Auth-Token: <MONITOR_TOKEN>`
+- **Query**: `?token=<MONITOR_TOKEN>`
 
 ### `/health`
 
-* **Success (200)**
+- **Success (200)**
 
   ```json
   {
@@ -109,7 +110,8 @@ All endpoints require authentication via either:
     "disk": 67.9
   }
   ```
-* **Failure (500)** when any metric exceeds its threshold:
+
+- **Failure (500)** when any metric exceeds its threshold:
 
   ```json
   {
@@ -130,27 +132,28 @@ curl -H "X-Auth-Token: your-strong-token" http://127.0.0.1:5000/health
 
 ## 📈 Integrating with Uptime Kuma
 
-* In Uptime Kuma, **Add New Monitor**
+- In Uptime Kuma, **Add New Monitor**
 
-   * **Type**: HTTP(s)
-   * **URL**: `http://172.17.0.1:5000/health`
-   * **Headers**:
+  - **Type**: HTTP(s)
+  - **URL**: `http://172.17.0.1:5000/health`
+  - **Headers**:
 
-     ```
-     X-Auth-Token: your-strong-token
-     ```
+    ```
+    X-Auth-Token: your-strong-token
+    ```
 
 ---
 
 ## 🔄 Updates & Uninstallation
 
-* To **update** the script or service file, replace the files in `/opt/simple-monitor/` and then:
+- To **update** the script or service file, replace the files in `/opt/simple-monitor/` and then:
 
   ```bash
   sudo systemctl daemon-reload
   sudo systemctl restart simple-monitor.service
   ```
-* To **uninstall**:
+
+- To **uninstall**:
 
   ```bash
   sudo systemctl stop simple-monitor.service
@@ -164,9 +167,7 @@ curl -H "X-Auth-Token: your-strong-token" http://127.0.0.1:5000/health
 
 ## 🛡️ Security Tips
 
-* Use a **strong**, unguessable `MONITOR_TOKEN`.
-* Bind only to necessary interfaces (e.g. localhost or Docker bridge).
+- Use a **strong**, unguessable `MONITOR_TOKEN`.
+- Bind only to necessary interfaces (e.g. localhost or Docker bridge).
 
 ---
-
-

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-import os
 import json
-import threading
-import psutil
+import os
 import signal
+import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
+
+import psutil
 from dotenv import load_dotenv
 
 # Load configuration from .env
@@ -25,18 +26,21 @@ def get_metrics():
     return (
         psutil.cpu_percent(interval=1),
         psutil.virtual_memory().percent,
-        psutil.disk_usage('/').percent,
+        psutil.disk_usage("/").percent,
     )
 
 
 class MonitorHandler(BaseHTTPRequestHandler):
     def authenticate(self):
-        token = self.headers.get("X-Auth-Token") or parse_qs(urlparse(self.path).query).get("token", [None])[0]
+        token = (
+            self.headers.get("X-Auth-Token")
+            or parse_qs(urlparse(self.path).query).get("token", [None])[0]
+        )
         return token == TOKEN
 
     def send_json(self, payload: dict, status_code: int = 200):
         self.send_response(status_code)
-        self.send_header('Content-Type', 'application/json')
+        self.send_header("Content-Type", "application/json")
         self.end_headers()
         self.wfile.write(json.dumps(payload).encode())
 
@@ -70,6 +74,7 @@ def shutdown(sig, frame):
         srv.shutdown()
     exit(0)
 
+
 if __name__ == "__main__":
     # Handle Ctrl+C and termination signals
     signal.signal(signal.SIGINT, shutdown)
@@ -82,4 +87,3 @@ if __name__ == "__main__":
 
     # Block until signals
     signal.pause()
-

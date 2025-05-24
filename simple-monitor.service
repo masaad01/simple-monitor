@@ -1,0 +1,18 @@
+[Unit]
+Description=Simple Server Resource Monitor
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/simple-monitor
+EnvironmentFile=/opt/simple-monitor/.env
+ExecStart=/opt/simple-monitor/venv/bin/python /opt/simple-monitor/monitor.py
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=3
+User=nobody
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.target

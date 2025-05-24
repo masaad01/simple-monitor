@@ -130,26 +130,15 @@ curl -H "X-Auth-Token: your-strong-token" http://127.0.0.1:5000/health
 
 ## 📈 Integrating with Uptime Kuma
 
-1. In Uptime Kuma, **Add New Monitor**
+* In Uptime Kuma, **Add New Monitor**
 
-   * **Type**: HTTP(s) – JSON Query
+   * **Type**: HTTP(s)
    * **URL**: `http://172.17.0.1:5000/health`
    * **Headers**:
 
      ```
      X-Auth-Token: your-strong-token
      ```
-2. **JSON Path**:
-
-   ```
-   $.status
-   ```
-3. **Assertion**:
-
-   ```
-   equals healthy
-   ```
-4. **Alert** if status ≠ `healthy`.
 
 ---
 
@@ -176,11 +165,6 @@ curl -H "X-Auth-Token: your-strong-token" http://127.0.0.1:5000/health
 ## 🛡️ Security Tips
 
 * Use a **strong**, unguessable `MONITOR_TOKEN`.
-* Secure the `.env` file so only root can read it:
-
-  ```bash
-  sudo chmod 600 /opt/simple-monitor/.env
-  ```
 * Bind only to necessary interfaces (e.g. localhost or Docker bridge).
 
 ---

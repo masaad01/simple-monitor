@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import csv
 import json
 import os
 import signal
 import threading
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs, urlparse
 
@@ -17,6 +19,23 @@ CPU_THRESHOLD = float(os.getenv("CPU_THRESHOLD", 85))
 MEM_THRESHOLD = float(os.getenv("MEM_THRESHOLD", 90))
 DISK_THRESHOLD = float(os.getenv("DISK_THRESHOLD", 90))
 TOKEN = os.getenv("MONITOR_TOKEN") or exit("Error: MONITOR_TOKEN not set in .env")
+
+# CSV logging setup
+CSV_FILE = os.getenv("CSV_FILE", "metrics.csv")
+# Ensure the CSV has a header
+if not os.path.exists(CSV_FILE):
+    with open(CSV_FILE, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["timestamp", "cpu", "memory", "disk", "status"])
+
+
+def log_csv(cpu, mem, disk, status):
+    """Append a metrics row to the CSV file with UTC timestamp."""
+    ts = datetime.utcnow().isoformat()
+    with open(CSV_FILE, "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([ts, f"{cpu:.1f}", f"{mem:.1f}", f"{disk:.1f}", status])
+
 
 servers = []  # Will hold HTTPServer instances
 
@@ -52,9 +71,20 @@ class MonitorHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
 
         if path == "/health":
-            payload = {"cpu": cpu, "memory": mem, "disk": disk}
+            # Determine health status
             unhealthy = cpu > CPU_THRESHOLD or mem > MEM_THRESHOLD or disk > DISK_THRESHOLD
-            payload["status"] = "unhealthy" if unhealthy else "healthy"
+            status = "unhealthy" if unhealthy else "healthy"
+
+            # Log to CSV
+            log_csv(cpu, mem, disk, status)
+
+            # Respond with metrics
+            payload = {
+                "cpu": round(cpu, 1),
+                "memory": round(mem, 1),
+                "disk": round(disk, 1),
+                "status": status,
+            }
             return self.send_json(payload, status_code=500 if unhealthy else 200)
 
         self.send_response(404)

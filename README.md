@@ -201,6 +201,7 @@ _Sample output:_
     ```
     X-Auth-Token: your-strong-token
     ```
+![image](https://github.com/user-attachments/assets/50ec777d-d638-465c-ab27-f940d80c9a4b)
 
 ---
 

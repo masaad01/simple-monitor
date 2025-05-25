@@ -1,20 +1,22 @@
 # Simple Server Resource Monitor
 
-A lightweight Python-based HTTP health-check service that reports CPU, memory, and disk usage. Also logs metrics to a CSV file for historical analysis and visualization. Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-kuma) (via HTTP JSON Query) and managed as a systemd service.
+A lightweight Python-based HTTP health-check service that reports CPU, memory, disk usage, **load averages**, **instantaneous network throughput**, and **monthly cumulative network usage**. Also logs metrics to a CSV file for historical analysis and visualization. Designed for integration with [Uptime Kuma](https://github.com/louislam/uptime-kuma) (via HTTP JSON Query) and managed as a systemd service.
 
 ---
 
 ## 📂 Project Structure
 
 ```
+
 /opt/simple-monitor/
-├── monitor.py               # Main Python script
-├── .env                     # Environment configuration
-├── venv/                    # Python virtual environment
-├── simple-monitor.service   # systemd unit file
-├── install.sh               # Automated installer
-├── metrics.csv              # CSV log of resource metrics
-└── README.md                # This file
+├── monitor.py # Main Python script
+├── .env # Environment configuration
+├── venv/ # Python virtual environment
+├── simple-monitor.service # systemd unit file
+├── install.sh # Automated installer
+├── metrics.csv # CSV log of resource metrics
+└── README.md # This file
+
 ```
 
 ---
@@ -80,6 +82,12 @@ CPU_THRESHOLD=85
 MEM_THRESHOLD=90
 DISK_THRESHOLD=90
 
+# Network interface to monitor
+NET_IFACE=eth0
+
+# State file for monthly accumulation
+NET_STATE_FILE=net_state.json
+
 # CSV log file path (optional)
 CSV_FILE=metrics.csv
 ```
@@ -106,20 +114,26 @@ All endpoints require authentication via either:
   ```json
   {
     "status": "healthy",
-    "cpu": 27.3,
-    "memory": 41.2,
-    "disk": 67.9
+    "cpu_pct": 27.3,
+    "mem_pct": 41.2,
+    "disk_pct": 67.9,
+    "load_avg": { "1m": 0.12, "5m": 0.08, "15m": 0.05 },
+    "net_kbps": { "sent": 1.5, "recv": 2.2 },
+    "net_monthly_mb": { "sent": 1234.56, "recv": 7890.12 }
   }
   ```
 
-- **Failure (500)** when any metric exceeds its threshold:
+- **Failure (500)** when any **CPU**, **memory**, or **disk** metric exceeds its threshold:
 
   ```json
   {
     "status": "unhealthy",
-    "cpu": 92.1,
-    "memory": 88.0,
-    "disk": 67.9
+    "cpu_pct": 92.1,
+    "mem_pct": 88.0,
+    "disk_pct": 67.9,
+    "load_avg": { "1m": 2.5, "5m": 1.8, "15m": 1.2 },
+    "net_kbps": { "sent": 0.0, "recv": 0.0 },
+    "net_monthly_mb": { "sent": 2345.67, "recv": 3456.78 }
   }
   ```
 
@@ -133,9 +147,16 @@ curl -H "X-Auth-Token: your-strong-token" http://127.0.0.1:5000/health
 
 ## 📈 Logging and Visualization
 
-Metrics are logged to a CSV file (`metrics.csv` by default).
+Metrics are logged to a CSV file (`metrics.csv` by default) with header:
 
-To visualize the data:
+```
+timestamp,
+cpu_pct, mem_pct, disk_pct,
+load1, load5, load15,
+net_sent_kbps, net_recv_kbps,
+month_sent_mb, month_recv_mb,
+status
+```
 
 1. **Spreadsheet Visualization**
    Open the CSV file (e.g., `metrics.csv`) in Google Sheets, Excel, or any spreadsheet software. You can easily create line charts or graphs using the data.
@@ -143,22 +164,28 @@ To visualize the data:
 2. **Python Visualization**
    Use the provided `plot.py` script to generate a visualization of system metrics:
 
-   - First, make sure you have the required Python libraries installed:
+- First, make sure you have the required Python libraries installed:
 
-     ```bash
-     pip install pandas matplotlib
-     ```
+  ```bash
+  pip install pandas matplotlib
+  ```
 
-   - Then, run the script with the CSV filename as an argument:
+- Then, run the script with the CSV filename as an argument:
 
-     ```bash
-     python3 plot.py metrics.csv
-     ```
+  ```bash
+  python3 plot.py metrics.csv
+  ```
 
-3. **Example Output**
+This will render:
 
-   _Here’s an example output chart:_
-   ![sample](https://github.com/user-attachments/assets/9af9f999-ca8b-4062-83b2-927a987692ed)
+- **System Metrics** (CPU / memory / disk)
+- **Load Averages** (1m / 5m / 15m)
+- **Instant Network Throughput** (KB/s)
+- **Monthly Cumulative Network Usage** (MB)
+
+_Sample output:_
+
+![sample](https://github.com/user-attachments/assets/9af9f999-ca8b-4062-83b2-927a987692ed)
 
 ---
 

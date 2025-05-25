@@ -185,7 +185,8 @@ This will render:
 
 _Sample output:_
 
-![sample](https://github.com/user-attachments/assets/9af9f999-ca8b-4062-83b2-927a987692ed)
+![sample2](https://github.com/user-attachments/assets/1ca8b26b-dfa3-43d8-94ef-eb3b7190a258)
+
 
 ---
 
